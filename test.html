@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <script src="https://libs.cartocdn.com/carto-vl/v1.2.6/carto-vl.min.js"></script>
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
+    <link href="https://carto.com/developers/carto-vl/v1.2.6/examples/maps/style.css" rel="stylesheet">
+    <style type="text/css">
+        aside.toolbox {
+            right: 96px;
+        }
+        .box {
+            width: 320px;
+            background: #f2f2f2;
+        }
+        section {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+        }
+        hr {
+            margin: 15px auto;
+        }
+        input[type=range] {
+            -webkit-appearance: none;
+            border: 1px solid white;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            flex: 1;
+            padding: auto 10px;
+            margin: auto 5px;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            height: 3px;
+            background: #1785FB;
+            border: none;
+            border-radius: 3px;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            border: none;
+            height: 10px;
+            width: 10px;
+            border-radius: 50%;
+            background: #1785FB;
+            margin-top: -4px;
+        }
+        input[type=range]:focus {
+            outline: none;
+        }
+        input[type=range]::-moz-range-track {
+            height: 3px;
+            background: #1785FB;
+            border: none;
+            border-radius: 3px;
+        }
+        input[type=range]::-moz-range-thumb {
+            border: none;
+            height: 10px;
+            width: 10px;
+            border-radius: 50%;
+            background: #1785FB;
+        }
+        input[type=range].white-thumb::-moz-range-thumb {
+            border-radius: 50%;
+            border: 2px solid #1785FB;
+            background: white;
+            height: 12px;
+            width: 12px;
+        }
+        input[type=range].white-thumb::-webkit-slider-thumb {
+            border-radius: 50%;
+            border: 3px solid #1785FB;
+            background: white;
+            height: 15px;
+            width: 15px;
+            margin-top: -6px;
+        }
+        input[type=range].white-thumb::-ms-thumb {
+            border-radius: 50%;
+            border: 2px solid #1785FB;
+            background: white;
+            height: 12px;
+            width: 12px;
+        }
+        input[type=range]:-moz-focusring {
+            outline: 1px solid white;
+            outline-offset: -1px;
+        }
+        input[type=range]::-ms-track {
+            height: 3px;
+            background: transparent;
+            border-color: transparent;
+            border-width: 6px 0;
+            color: transparent;
+        }
+        input[type=range]::-ms-fill-lower {
+            background: #1785FB;
+        }
+        input[type="range"]::-moz-range-progress {
+            background: #1785FB;
+        }
+        input[type=range]::-ms-fill-upper {
+            background: #ccc;
+        }
+        input[type="range"]::-moz-range-track {
+            background: #ccc;
+        }
+        input[type=range]::-ms-thumb {
+            border: none;
+            height: 10px;
+            width: 10px;
+            border-radius: 50%;
+            background: #1785FB;
+        }
+        input[type="button"] {
+            width: 36px;
+            height: 36px;
+            border-radius: 4px;
+            border: 0;
+            box-shadow: none;
+            color: #fff;
+            cursor: pointer;
+            display: inline-flex;
+            font: 500 12px/20px 'Roboto';
+            margin: 0;
+            margin-right: 10px;
+        }
+        #map {
+            flex: 1;
+        }
+        #js-duration-span {
+            background: white;
+            border: 1px solid #ddd;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #js-play-button {
+            background: url('./play.svg') no-repeat;
+            background-color: #1785FB;
+            background-position: center;
+        }
+        #js-pause-button {
+            background: url('./pause.svg') no-repeat;
+            background-color: #1785FB;
+            background-position: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- Add map container -->
+
+    <div id="map"></div>
+    <!-- Animation control elements -->
+    <aside class="toolbox">
+        <div class="box">
+            <header>
+                <h1>Dummy Data</h1>
+            </header>
+            <section>
+                <p class="description open-sans">Add animation controls for "play", "pause" and "set" commands</p>
+            </section>
+            <section style="margin-top: 15px;">
+                <input type="button" id="js-play-button">
+                <input type="button" id="js-pause-button">
+                <input type="range" id="js-time-range" min="0" max="1" step="0.01">
+            </section>
+            <br />
+            <section>
+                <span id="js-current-time" class="open-sans"></span>
+            </section>
+            <hr>
+            <section>
+                <span style="margin-right: 5px" class="open-sans">Duration (seconds)</span>
+                <input class="white-thumb" type="range" id="js-duration-range" min="1" max="60" step="1">
+                <span style="margin-left: 5px" class="open-sans" id="js-duration-span">10</span>
+            </section>
+        </div>
+    </aside>
+    <div id="loader">
+        <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
+            <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
+                <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
+            </svg>
+        </div>
+    </div>
+
+    <script>
+        // Add basemap and set properties
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: carto.basemaps.voyager,
+            center: [8, 52.00],
+            zoom: 3
+        });
+
+        const nav = new mapboxgl.NavigationControl();
+        map.addControl(nav, 'top-left');
+
+        //** CARTO VL functionality begins here **//
+
+        // Define user
+        carto.setDefaultAuth({
+            //username: 'wri-rw',
+            username: 'cartovl',
+            apiKey: 'default_public'
+        });
+
+        // Define source
+        const query = 'SELECT l.cartodb_id, l.the_geom, l.the_geom_webmercator, l.adm0_a3, r.year, r.value, make_date(r.year,1,1) as datetime FROM "wri-rw".geoms_test AS l LEFT JOIN "wri-rw".table_t r ON l.adm0_a3 = r.adm0_a3';
+
+        const query2 = 'SELECT l.cartodb_id, l.the_geom, l.the_geom_webmercator, l.pfaf_id, r.bwd_cat as value, make_date(r.year,r.month,1) as datetime FROM "wri-rw".y2018m12d06_rh_master_shape_v02_2 as l LEFT JOIN "wri-rw".water_risk_indicators_monthly r ON l.pfaf_id = r.pfaf_id'
+
+        //const source = new carto.source.Dataset('geoms_test');
+        
+        const source = new carto.source.SQL(query2, {
+            username: 'wri-rw',
+            apiKey: 'default_public'
+        });
+        
+
+        //const source = new carto.source.Dataset('seattle_collisions');
+
+        // Define Viz object and custom style
+        /*
+        const viz = new carto.Viz(`
+            color: ramp(globalQuantiles($value, 3), [midnightblue, deeppink, gold])
+            width: 5
+        `);
+        */
+
+        const viz = new carto.Viz(`
+            @duration: 10
+            @animation: animation($datetime, @duration, fade(0.5,100))
+            filter:@animation
+            color: ramp(buckets($value, [0,1,2,3,4]), [#FFFF99,#FFE600,#FF9900,#FF1900,#990000])
+            //color: turquoise
+        `);
+
+        // Define map layer
+        const layer = new carto.Layer('layer', source, viz);
+
+        layer.addTo(map);
+
+        // Get animation control elements
+        const $playbutton = document.getElementById('js-play-button');
+        const $pausebutton = document.getElementById('js-pause-button');
+        const $durationRange = document.getElementById('js-duration-range');
+        const $timeRange = document.getElementById('js-time-range');
+        const $spanDuration = document.getElementById('js-duration-span');
+        const $currentTime = document.getElementById('js-current-time');
+
+        // Save initial time range value
+        let last = $timeRange.value;
+
+
+        // Listen to interaction events
+        $durationRange.addEventListener('change', () => {
+            const duration = parseInt($durationRange.value, 10);
+            // Update animation duration
+            viz.variables.duration = $spanDuration.innerHTML = duration;
+        });
+
+
+        $playbutton.addEventListener('click', () => {
+            // Play the animation
+            viz.variables.animation.play()
+        });
+        $pausebutton.addEventListener('click', () => {
+            // Pause the animation
+            viz.variables.animation.pause();
+        });
+        $timeRange.addEventListener('change', () => {
+            // Update animation progress
+            viz.variables.animation.setProgressPct($timeRange.value);
+            last = $timeRange.value;
+        });
+
+
+        // Listen to layer events
+        layer.on('updated', () => {
+            if ($timeRange.value == last) {
+                $timeRange.value = viz.variables.animation.getProgressPct();
+                last = $timeRange.value;
+            }
+            $currentTime.innerText = viz.variables.animation.getProgressValue().toISOString();
+        });
+
+        layer.on('loaded', hideLoader);
+
+        function hideLoader() {
+            document.getElementById('loader').style.opacity = '0';
+        }
+
+
+    </script>
+</body>
+</html>
