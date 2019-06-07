@@ -197,7 +197,7 @@
             container: 'map',
             style: carto.basemaps.voyager,
             center: [8, 52.00],
-            zoom: 3
+            zoom: 10
         });
 
         const nav = new mapboxgl.NavigationControl();
@@ -215,7 +215,7 @@
         // Define source
         const query = 'SELECT l.cartodb_id, l.the_geom, l.the_geom_webmercator, l.adm0_a3, r.year, r.value, make_date(r.year,1,1) as datetime FROM "wri-rw".geoms_test AS l LEFT JOIN "wri-rw".table_t r ON l.adm0_a3 = r.adm0_a3';
 
-        const query2 = 'SELECT l.cartodb_id, l.the_geom, l.the_geom_webmercator, l.pfaf_id, r.bwd_cat as value, make_date(r.year,r.month,1) as datetime FROM "wri-rw".y2018m12d06_rh_master_shape_v02_2 as l LEFT JOIN "wri-rw".water_risk_indicators_monthly r ON l.pfaf_id = r.pfaf_id'
+        const query2 = 'SELECT l.cartodb_id, l.the_geom_webmercator, l.pfaf_id, r.bwd_cat as value, make_date(r.year,r.month,1) as datetime FROM "wri-rw".y2018m12d06_rh_master_shape_v02_2 as l LEFT JOIN "wri-rw".water_risk_indicators_monthly r ON l.pfaf_id = r.pfaf_id'
 
         //const source = new carto.source.Dataset('geoms_test');
         
@@ -237,9 +237,9 @@
 
         const viz = new carto.Viz(`
             @duration: 10
-            @animation: animation($datetime, @duration, fade(0.5,100))
+            @animation: animation($datetime, @duration, fade(0.5,1000))
             filter:@animation
-            color: ramp(buckets($value, [0,1,2,3,4]), [#FFFF99,#FFE600,#FF9900,#FF1900,#990000])
+            color: ramp(buckets($value, [-1,0,1,2,3,4]), [#808080,#FFFF99,#FFE600,#FF9900,#FF1900,#990000])
             //color: turquoise
         `);
 
